@@ -9,6 +9,7 @@
             "resourceType": "core/franklin/components/block/v1/block",
             "template": {
               "name": "Cards Category",
+              "model": "cards-category",
               "filter": "cards-category"
             }
           }
@@ -32,6 +33,21 @@
     }
   ],
   "models": [
+    {
+      "id": "cards-category",
+      "fields": [
+        {
+          "component": "select",
+          "name": "classes",
+          "label": "Style",
+          "valueType": "string",
+          "options": [
+            { "name": "Default", "value": "" },
+            { "name": "Brands", "value": "brands" }
+          ]
+        }
+      ]
+    },
     {
       "id": "card",
       "fields": [

@@ -55,13 +55,11 @@ export default function parse(element, { document }) {
     const tabpanel = item.querySelector('[role="tabpanel"]');
     const contentDiv = tabpanel ? (tabpanel.querySelector('.content') || tabpanel) : null;
 
-    // Summary cell with field hint
+    // Summary cell with field hint (plain text — model field is "text" not "richtext")
     const summaryFrag = document.createDocumentFragment();
     summaryFrag.appendChild(document.createComment(' field:summary '));
     if (tab) {
-      const p = document.createElement('p');
-      p.textContent = tab.textContent.trim();
-      summaryFrag.appendChild(p);
+      summaryFrag.appendChild(document.createTextNode(tab.textContent.trim()));
     }
 
     // Text cell with field hint
@@ -82,5 +80,9 @@ export default function parse(element, { document }) {
   if (cells.length === 0) return;
 
   const block = createBlockHelper(document, { name: 'accordion-faq', cells });
-  faqContainer.replaceWith(block);
+
+  // Remove sibling FAQ items (they're now captured in the block)
+  allItems.forEach((item) => { if (item !== element) item.remove(); });
+  // Replace the matched element with the block
+  element.replaceWith(block);
 }

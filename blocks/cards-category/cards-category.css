@@ -25,3 +25,18 @@
   aspect-ratio: 4 / 3;
   object-fit: cover;
 }
+
+/* Brands variant — show logos only, hide text labels */
+.cards-category.brands .cards-category-card-body {
+  display: none;
+}
+
+.cards-category.brands > ul > li {
+  border: none;
+  background-color: transparent;
+}
+
+.cards-category.brands > ul > li img {
+  aspect-ratio: auto;
+  object-fit: contain;
+}

@@ -46,6 +46,9 @@ export default function parse(element, { document }) {
   const figure = heroContainer ? heroContainer.querySelector('figure') : null;
   const bgImage = figure ? figure.querySelector('img') : null;
 
+  // Remove the figure to prevent it appearing as duplicate default content
+  if (figure && figure.parentElement) figure.remove();
+
   // Extract text content from .shadow-cards div
   // Found: h1, p with subtitle, benefit paragraphs, CTA button
   const heading = element.querySelector('.desktop h1') || element.querySelector('h1');

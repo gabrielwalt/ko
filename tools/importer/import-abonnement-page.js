@@ -5,6 +5,9 @@
 import heroSubscriptionParser from './parsers/hero-subscription.js';
 import cardsStepsParser from './parsers/cards-steps.js';
 import cardsCategoryParser from './parsers/cards-category.js';
+import cardsCategoryBrandsParser from './parsers/cards-category-brands.js';
+import bannerParser from './parsers/banner.js';
+import tabsParser from './parsers/tabs.js';
 import cardsProductParser from './parsers/cards-product.js';
 import accordionFaqParser from './parsers/accordion-faq.js';
 
@@ -17,6 +20,9 @@ const parsers = {
   'hero-subscription': heroSubscriptionParser,
   'cards-steps': cardsStepsParser,
   'cards-category': cardsCategoryParser,
+  'cards-category-brands': cardsCategoryBrandsParser,
+  'banner': bannerParser,
+  'tabs': tabsParser,
   'cards-product': cardsProductParser,
   'accordion-faq': accordionFaqParser,
 };
@@ -52,8 +58,16 @@ const PAGE_TEMPLATE = {
       instances: ['.column.main .coffeType-mobile-icon'],
     },
     {
-      name: 'cards-product',
-      instances: ['.tabs-style-theme-related .product-items'],
+      name: 'cards-category-brands',
+      instances: ['.column.main .desktop [class*="brand-abo"]'],
+    },
+    {
+      name: 'banner',
+      instances: ['.column.main img[src*="1440x450_desk"]'],
+    },
+    {
+      name: 'tabs',
+      instances: ['.tab-align-left'],
     },
     {
       name: 'accordion-faq',
@@ -73,6 +87,7 @@ const PAGE_TEMPLATE = {
       id: 'section-2',
       name: 'How It Works',
       selector: '.column.main > div:nth-of-type(2)',
+      headingMatch: 'Hoe werkt het',
       style: null,
       blocks: ['cards-steps'],
       defaultContent: ['#DYDDJVR'],
@@ -81,8 +96,9 @@ const PAGE_TEMPLATE = {
       id: 'section-3',
       name: 'Choose Your Coffee',
       selector: '.column.main > div:nth-of-type(3)',
+      headingMatch: 'Kies je koffie',
       style: null,
-      blocks: ['cards-category'],
+      blocks: ['cards-category', 'cards-category-brands', 'banner'],
       defaultContent: ['#PWJHN6R'],
     },
     {
@@ -90,21 +106,23 @@ const PAGE_TEMPLATE = {
       name: 'Popular Products',
       selector: '.tab-align-left',
       style: null,
-      blocks: ['cards-product'],
+      blocks: ['tabs'],
       defaultContent: ['.tabs-title'],
     },
     {
       id: 'section-5',
       name: 'Subscription Explanation',
       selector: '#uitleg',
-      style: null,
+      headingMatch: 'Bespaar',
+      style: 'beige',
       blocks: [],
-      defaultContent: ['#uitleg ~ div h2', '#uitleg ~ div p'],
+      defaultContent: [],
     },
     {
       id: 'section-6',
       name: 'FAQ',
       selector: '#YDF0B3T',
+      headingMatch: 'Veelgestelde vragen',
       style: null,
       blocks: ['accordion-faq'],
       defaultContent: ['#YDF0B3T'],

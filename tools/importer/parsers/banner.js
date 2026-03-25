@@ -1,0 +1,94 @@
+/* eslint-disable */
+/* global WebImporter */
+
+/**
+ * Parser for banner (art direction).
+ * Source: https://www.koffievoordeel.nl/abonnement
+ * Model fields: imageDesktop (reference), imageMobile (reference)
+ * Single-row block with two image cells for responsive breakpoints.
+ * Source selector: .column.main img[src*="1440x450_desk"]
+ * Both desktop and mobile images are inside the same <figure>.
+ */
+
+function createBlockHelper(doc, { name, cells }) {
+  if (typeof WebImporter !== 'undefined' && WebImporter.Blocks) {
+    return WebImporter.Blocks.createBlock(doc, { name, cells });
+  }
+  const table = doc.createElement('table');
+  const headerRow = doc.createElement('tr');
+  const headerCell = doc.createElement('td');
+  headerCell.colSpan = 100;
+  headerCell.textContent = name;
+  headerRow.appendChild(headerCell);
+  table.appendChild(headerRow);
+  cells.forEach((row) => {
+    const tr = doc.createElement('tr');
+    const rowArr = Array.isArray(row) ? row : [row];
+    rowArr.forEach((cell) => {
+      const td = doc.createElement('td');
+      if (cell instanceof Node) {
+        td.appendChild(cell);
+      } else if (typeof cell === 'string') {
+        td.textContent = cell;
+      }
+      tr.appendChild(td);
+    });
+    table.appendChild(tr);
+  });
+  return table;
+}
+
+export default function parse(element, { document }) {
+  if (!element.parentElement) return;
+
+  // element = img with src*="1440x450_desk"
+  // Both desk and mob images are inside the same <figure>
+  const figure = element.closest('figure') || element.parentElement;
+
+  // Find desktop and mobile images
+  let desktopImg = null;
+  let mobileImg = null;
+  const allImgs = figure.querySelectorAll('img');
+  allImgs.forEach((img) => {
+    const src = img.src || img.getAttribute('data-src') || '';
+    if (src.includes('desk')) desktopImg = img;
+    else if (src.includes('mob')) mobileImg = img;
+  });
+
+  // Fallback: the matched element itself is the desktop image
+  if (!desktopImg) desktopImg = element;
+
+  const cells = [];
+
+  // Row 1: Desktop image
+  if (desktopImg) {
+    const frag = document.createDocumentFragment();
+    frag.appendChild(document.createComment(' field:imageDesktop '));
+    const img = document.createElement('img');
+    img.src = desktopImg.src || desktopImg.getAttribute('data-src') || '';
+    img.alt = desktopImg.alt || '';
+    frag.appendChild(img);
+    cells.push([frag]);
+  }
+
+  // Row 2: Mobile image
+  if (mobileImg) {
+    const frag = document.createDocumentFragment();
+    frag.appendChild(document.createComment(' field:imageMobile '));
+    const img = document.createElement('img');
+    img.src = mobileImg.src || mobileImg.getAttribute('data-src') || '';
+    img.alt = mobileImg.alt || '';
+    frag.appendChild(img);
+    cells.push([frag]);
+  }
+
+  if (cells.length === 0) return;
+
+  const block = createBlockHelper(document, { name: 'banner', cells });
+
+  // Replace the figure (or its wrapper div) with the block
+  const replaceTarget = figure.parentElement && figure.parentElement.children.length === 1
+    ? figure.parentElement
+    : figure;
+  replaceTarget.replaceWith(block);
+}

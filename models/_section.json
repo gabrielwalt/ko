@@ -33,6 +33,10 @@
             {
               "name": "Highlight",
               "value": "highlight"
+            },
+            {
+              "name": "Beige",
+              "value": "beige"
             }
           ]
         }
@@ -49,8 +53,15 @@
         "title",
         "hero",
         "cards",
+        "cards-category",
+        "cards-product",
+        "cards-steps",
         "columns",
-        "fragment"
+        "fragment",
+        "hero-subscription",
+        "accordion-faq",
+        "banner",
+        "tabs"
       ]
     }
   ]

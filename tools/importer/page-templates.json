@@ -26,9 +26,21 @@
           ]
         },
         {
-          "name": "cards-product",
+          "name": "cards-category-brands",
           "instances": [
-            ".tabs-style-theme-related .product-items"
+            ".column.main .desktop [class*=\"brand-abo\"]"
+          ]
+        },
+        {
+          "name": "banner",
+          "instances": [
+            ".column.main img[src*=\"1440x450_desk\"]"
+          ]
+        },
+        {
+          "name": "tabs",
+          "instances": [
+            ".tab-align-left"
           ]
         },
         {
@@ -53,6 +65,7 @@
           "id": "section-2",
           "name": "How It Works",
           "selector": ".column.main > div:nth-of-type(2)",
+          "headingMatch": "Hoe werkt het",
           "style": null,
           "blocks": [
             "cards-steps"
@@ -65,9 +78,12 @@
           "id": "section-3",
           "name": "Choose Your Coffee",
           "selector": ".column.main > div:nth-of-type(3)",
+          "headingMatch": "Kies je koffie",
           "style": null,
           "blocks": [
-            "cards-category"
+            "cards-category",
+            "cards-category-brands",
+            "banner"
           ],
           "defaultContent": [
             "#PWJHN6R"
@@ -79,7 +95,7 @@
           "selector": ".tab-align-left",
           "style": null,
           "blocks": [
-            "cards-product"
+            "tabs"
           ],
           "defaultContent": [
             ".tabs-title"
@@ -89,17 +105,16 @@
           "id": "section-5",
           "name": "Subscription Explanation",
           "selector": "#uitleg",
-          "style": null,
+          "headingMatch": "Bespaar",
+          "style": "beige",
           "blocks": [],
-          "defaultContent": [
-            "#uitleg ~ div h2",
-            "#uitleg ~ div p"
-          ]
+          "defaultContent": []
         },
         {
           "id": "section-6",
           "name": "FAQ",
           "selector": "#YDF0B3T",
+          "headingMatch": "Veelgestelde vragen",
           "style": null,
           "blocks": [
             "accordion-faq"

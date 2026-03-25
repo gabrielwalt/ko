@@ -41,12 +41,16 @@ export default function transform(hookName, element, payload) {
 
     // Remove hidden desktop containers (duplicate of visible mobile versions)
     // These are .column.main > div wrappers whose first child has class "desktop"
+    // Keep containers with brand logos (brand-abo-*, brand-starbucks)
     const mainColBefore = element.querySelector('.column.main');
     if (mainColBefore) {
       [...mainColBefore.children].forEach((child) => {
         const fc = child.firstElementChild;
         if (fc && fc.classList.contains('desktop')) {
-          child.remove();
+          const hasBrandLogos = child.querySelector('[class*="brand-"]');
+          if (!hasBrandLogos) {
+            child.remove();
+          }
         }
       });
     }
@@ -113,24 +117,25 @@ export default function transform(hookName, element, payload) {
         }
       });
 
-      // Remove all content after the accordion-faq block table
-      let faqTable = null;
+      // Remove all content after the last block table in .column.main
+      // (block tables are <table> elements with a single-cell header row)
+      let lastBlockTable = null;
       mainCol.querySelectorAll('table').forEach((t) => {
         const header = t.querySelector('tr:first-child th') || t.querySelector('tr:first-child td');
-        if (header && header.textContent.trim() === 'accordion-faq') {
-          faqTable = t;
+        if (header) {
+          lastBlockTable = t;
         }
       });
-      if (faqTable) {
-        // Remove siblings after the FAQ table within its parent
-        let next = faqTable.nextElementSibling;
+      if (lastBlockTable) {
+        // Remove siblings after the last block table within its parent
+        let next = lastBlockTable.nextElementSibling;
         while (next) {
           const toRemove = next;
           next = next.nextElementSibling;
           toRemove.remove();
         }
-        // Remove .column.main children after the FAQ table's container div
-        let containerDiv = faqTable.parentElement;
+        // Remove .column.main children after the block table's container div
+        let containerDiv = lastBlockTable.parentElement;
         while (containerDiv && containerDiv.parentElement !== mainCol) {
           containerDiv = containerDiv.parentElement;
         }

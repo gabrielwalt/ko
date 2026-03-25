@@ -28,19 +28,19 @@ Mountpoints must use your org’s **Franklin delivery** URL (Code Sync), not the
 
 ## Source site — koffievoordeel.nl
 
-Document DOM patterns here as you discover them (selectors, wrappers, grids, edge cases).
+- **Platform**: Magento 2 (Adobe Commerce) with PageBuilder
+- **Main content regions**: `.column.main` — primary content column; PageBuilder `div` rows inside
+- **Sections**: Visual bands map to direct children of `.column.main`; some use `#id` anchors (`#uitleg`), others identified by heading text
+- **Images / CDN**: Product images at `koffievoordeel.nl/media/catalog/product/`; PageBuilder uploads at `koffievoordeel.nl/media/`
+- **Special cases**: RequireJS globals interfere with UMD imports; cookie consent auto-dismissed; `.desktop`/`.mobile` visibility wrappers for responsive content; Magento placeholder images for missing products
 
-- **Platform**: _(to confirm — e.g. commerce / CMS stack, templates)_
-- **Main content regions**: _(landmarks / main column selectors)_
-- **Sections**: _(how visual bands map to HTML — wrappers, full-bleed vs contained)_
-- **Images / CDN**: _(domains, query params, lazy-load attributes)_
-- **Special cases**: _(iframes, third-party widgets, cookie banners to strip in import)_
-
-### CDN / assets (fill in)
+### CDN / assets
 
 | Source | Domain / pattern | Notes |
 |--------|------------------|--------|
-| _(add rows)_ | | |
+| Product images | `koffievoordeel.nl/media/catalog/product/` | Real product photos with `?quality=95&fit=bounds` params |
+| Placeholder | `Magento_Catalog/images/product/placeholder/small_image.jpg` | Missing product images — skip in parsers |
+| PageBuilder | `koffievoordeel.nl/media/` | CMS-uploaded assets (banners, icons) |
 
 ---
 
@@ -59,37 +59,43 @@ Boilerplate defaults live in `styles/styles.css` until replaced with Koffievoord
 
 ### Section styles
 
-| Style (UE) | Class on section | CSS |
-|--------------|------------------|-----|
-| Highlight | `highlight` → `.section.highlight` | `styles/styles.css` (shared with `.section.light` background) |
+| Style (UE) | Class on section | CSS | Used on |
+|--------------|------------------|-----|---------|
+| Highlight | `highlight` → `.section.highlight` | `styles/styles.css` — light background | General |
+| Beige | `beige` → `.section.beige` | `styles/styles.css` — `background-color: #f5f0eb` | Abonnement section 5 |
 
-The section model’s multiselect currently exposes **Highlight** (`highlight`). Styles also define `.section.light` if you add that option to the model later.
+The section model’s multiselect (`models/_section.json`) exposes **Highlight** and **Beige**.
 
 ---
 
 ## Block reference
 
-Blocks registered in the main section filter (`models/_section.json` → `section` filter): `text`, `image`, `button`, `title`, `hero`, `cards`, `columns`, `fragment`. Default content types come from `models/` spreads.
+Blocks registered in the main section filter (`models/_section.json` → `section` filter): `text`, `image`, `button`, `title`, `hero`, `cards`, `cards-category`, `cards-product`, `cards-steps`, `columns`, `fragment`, `hero-subscription`, `accordion-faq`, `banner`, `tabs`.
 
-### `cards`
+Default content types come from `models/` spreads.
 
-**Location**: `blocks/cards/` — `_cards.json`, `cards.js`, `cards.css`
+### Boilerplate blocks
 
-### `columns`
+| Block | Location | Notes |
+|-------|----------|-------|
+| `hero` | `blocks/hero/` | Standard EDS hero (`_hero.json`, `hero.js`, `hero.css`) |
+| `cards` | `blocks/cards/` | Standard EDS cards |
+| `columns` | `blocks/columns/` | Standard EDS columns |
+| `fragment` | `blocks/fragment/` | Standard EDS fragment |
+| `header` / `footer` | `blocks/header/`, `blocks/footer/` | Chrome blocks (not in section filter) |
 
-**Location**: `blocks/columns/` — `_columns.json`, `columns.js`, `columns.css`
+### Custom blocks (created for migration)
 
-### `fragment`
-
-**Location**: `blocks/fragment/` — `_fragment.json`, `fragment.js`, `fragment.css`
-
-### `hero`
-
-**Location**: `blocks/hero/` — `_hero.json`, `hero.css` (no `hero.js` in repo yet; decoration may be minimal or pending)
-
-### `header` / `footer`
-
-**Location**: `blocks/header/`, `blocks/footer/` — chrome blocks (`header.js` / `footer.js`, CSS). Not listed in the main section `components` filter; used as configured in your page / experience fragment setup.
+| Block | Variants | Purpose | Import selector |
+|-------|----------|---------|-----------------|
+| `hero-subscription` | — | Subscription hero with bg image + feature cards | `.column.main .pagebuilder-column.shadow-cards` |
+| `cards-steps` | — | Horizontal step cards ("Hoe werkt het") | `.kv-steps-slider` |
+| `cards-category` | Default, **Brands** | Category icons / brand logos grid | `.coffeType-mobile-icon` / `.desktop [class*="brand-abo"]` |
+| `cards-product` | — | Product card (image, name, intensity, price, CTA) | _(used as richtext inside tabs)_ |
+| `banner` | — | Art-directed responsive banner (desktop + mobile `<picture>`) | `img[src*="1440x450_desk"]` |
+| `tabs` | — | ARIA tab navigation (container with label + richtext panels) | `.tab-align-left` |
+| `accordion-faq` | — | FAQ accordion (`<details>/<summary>`) | `[data-collapsible="true"]` |
+| `hero-quote` | — | Hero with quote styling | _(not used on abonnement)_ |
 
 ### Default content (`models/`)
 
@@ -99,33 +105,41 @@ Blocks registered in the main section filter (`models/_section.json` → `sectio
 
 ## Import infrastructure
 
-**Status**: Not present yet — add under `tools/importer/` when you start bulk import.
+**Status**: Active — abonnement-page template complete and importing successfully.
 
-When added:
+### Templates
 
-- **Entry**: `tools/importer/import.js`
-- **Bundle**: `tools/importer/import.bundle.js` (generated; do not hand-edit)
-- **URL list**: e.g. `tools/importer/urls.txt` with the six source URLs below
-
-Use selector-based parsers, document order, and transformer hooks (`beforeTransform` / `afterTransform`) in the tables below as you implement them.
+| Template | Import script | URL list | Status |
+|----------|--------------|----------|--------|
+| `abonnement-page` | `import-abonnement-page.js` | `urls-abonnement-page.txt` | Working |
 
 ### Parsers
 
-| Parser | File | Source selector(s) |
-|--------|------|---------------------|
-| _(none yet)_ | | |
+| Parser | File | Block | Source selector |
+|--------|------|-------|-----------------|
+| hero-subscription | `parsers/hero-subscription.js` | hero-subscription | `.pagebuilder-column.shadow-cards` |
+| cards-steps | `parsers/cards-steps.js` | cards-steps | `.kv-steps-slider` |
+| cards-category | `parsers/cards-category.js` | cards-category | `.coffeType-mobile-icon` |
+| cards-category-brands | `parsers/cards-category-brands.js` | cards-category (brands) | `.desktop [class*="brand-abo"]` |
+| banner | `parsers/banner.js` | banner | `img[src*="1440x450_desk"]` |
+| tabs | `parsers/tabs.js` | tabs | `.tab-align-left` |
+| cards-product | `parsers/cards-product.js` | cards-product | _(available, not in abonnement template)_ |
+| accordion-faq | `parsers/accordion-faq.js` | accordion-faq | `[data-collapsible="true"]` |
 
 ### Transformers
 
 | Transformer | File | Hook | Purpose |
 |-------------|------|------|---------|
-| _(none yet)_ | | | |
+| koffievoordeel-cleanup | `transformers/koffievoordeel-cleanup.js` | `beforeTransform` | Remove tracking, scripts, empty elements, post-FAQ junk |
+| koffievoordeel-sections | `transformers/koffievoordeel-sections.js` | `afterTransform` | Insert `<hr>` section breaks + section-metadata via multi-strategy anchor finding |
 
-### Bundle example
+### Bundling
 
+**Always use `aem-import-bundle.sh`** (not raw esbuild with `--format=esm`):
 ```bash
-npx esbuild tools/importer/import.js --bundle --format=iife --global-name=CustomImportScript --outfile=tools/importer/import.bundle.js
+bash $SCRIPTS_DIR/aem-import-bundle.sh --importjs tools/importer/import-abonnement-page.js
 ```
+This creates IIFE format (`var CustomImportScript = ...`) required by `run-bulk-import.js`.
 
 ---
 
@@ -133,24 +147,26 @@ npx esbuild tools/importer/import.js --bundle --format=iife --global-name=Custom
 
 ### Pages (initial scope)
 
-| Page | Source URL | AEM / EDS path | Status |
-|------|------------|----------------|--------|
-| Abonnement | [https://www.koffievoordeel.nl/abonnement](https://www.koffievoordeel.nl/abonnement) | | Not started |
-| Illy Iperespresso recepten | [https://www.koffievoordeel.nl/drie-heerlijke-illy-iperespresso-recepten](https://www.koffievoordeel.nl/drie-heerlijke-illy-iperespresso-recepten) | | Not started |
-| Abonnement wijzigen | [https://www.koffievoordeel.nl/abonnement-wijzigen](https://www.koffievoordeel.nl/abonnement-wijzigen) | | Not started |
-| Terug in de tijd met Illy | [https://www.koffievoordeel.nl/terug-in-de-tijd-met-illy](https://www.koffievoordeel.nl/terug-in-de-tijd-met-illy) | | Not started |
-| Gran Maestro Italiano | [https://www.koffievoordeel.nl/gran-maestro-italiano-experience](https://www.koffievoordeel.nl/gran-maestro-italiano-experience) | | Not started |
-| Blog — wetenschap koffie | [https://www.koffievoordeel.nl/blog/de-wetenschap-achter-de-perfecte-kop-koffie](https://www.koffievoordeel.nl/blog/de-wetenschap-achter-de-perfecte-kop-koffie) | | Not started |
+| Page | Source URL | Template | Status |
+|------|------------|----------|--------|
+| Abonnement | [/abonnement](https://www.koffievoordeel.nl/abonnement) | `abonnement-page` | **Imported** — 22 blocks, 7 sections |
+| Illy Iperespresso recepten | [/drie-heerlijke-illy-iperespresso-recepten](https://www.koffievoordeel.nl/drie-heerlijke-illy-iperespresso-recepten) | — | Not started |
+| Abonnement wijzigen | [/abonnement-wijzigen](https://www.koffievoordeel.nl/abonnement-wijzigen) | — | Not started |
+| Terug in de tijd met Illy | [/terug-in-de-tijd-met-illy](https://www.koffievoordeel.nl/terug-in-de-tijd-met-illy) | — | Not started |
+| Gran Maestro Italiano | [/gran-maestro-italiano-experience](https://www.koffievoordeel.nl/gran-maestro-italiano-experience) | — | Not started |
+| Blog — wetenschap koffie | [/blog/de-wetenschap-achter-de-perfecte-kop-koffie](https://www.koffievoordeel.nl/blog/de-wetenschap-achter-de-perfecte-kop-koffie) | — | Not started |
 
-### Content verification (template)
+### Abonnement content verification
 
 | Content | Captured | Details |
 |---------|----------|---------|
-| Hero / above-the-fold | | |
-| Body copy & headings | | |
-| Images & alt text | | |
-| CTAs / forms | | |
-| Footer / legal | | |
+| Hero / above-the-fold | Yes | hero-subscription with bg image + feature cards |
+| Body copy & headings | Yes | Section headings, subscription explanation text |
+| Images & alt text | Yes | Product images, brand logos, banner (art-directed). Placeholder images skipped. |
+| CTAs / links | Yes | "Bekijk en bestel" product CTAs, "Bekijk alle" category links |
+| Tabs | Yes | Koffiebonen (4 products) + Koffiecups (4 products) |
+| FAQ | Yes | 8 accordion items |
+| Section styling | Yes | Beige background on subscription explanation section |
 
 ---
 

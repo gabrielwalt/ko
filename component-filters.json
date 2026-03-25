@@ -14,8 +14,15 @@
       "title",
       "hero",
       "cards",
+      "cards-category",
+      "cards-product",
+      "cards-steps",
       "columns",
-      "fragment"
+      "fragment",
+      "hero-subscription",
+      "accordion-faq",
+      "banner",
+      "tabs"
     ]
   },
   {
@@ -26,12 +33,6 @@
   },
   {
     "id": "cards-category",
-    "components": [
-      "card"
-    ]
-  },
-  {
-    "id": "cards-logos",
     "components": [
       "card"
     ]
@@ -67,6 +68,12 @@
       "image",
       "button",
       "title"
+    ]
+  },
+  {
+    "id": "tabs",
+    "components": [
+      "tabs-panel"
     ]
   }
 ]

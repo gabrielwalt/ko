@@ -1,0 +1,15 @@
+.banner-container .banner-wrapper {
+  max-width: unset;
+  padding: 0;
+}
+
+.banner {
+  line-height: 0;
+}
+
+.banner picture,
+.banner img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
