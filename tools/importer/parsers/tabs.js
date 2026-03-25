@@ -124,12 +124,12 @@ export default function parse(element, { document }) {
 
     // Label cell (plain text for "text" component)
     const labelFrag = document.createDocumentFragment();
-    labelFrag.appendChild(document.createComment(' field:label '));
+    labelFrag.appendChild(document.createComment(' field:tabLabel '));
     labelFrag.appendChild(document.createTextNode(label));
 
     // Content cell — richtext with "Bekijk alle" link + product cards
     const contentFrag = document.createDocumentFragment();
-    contentFrag.appendChild(document.createComment(' field:content '));
+    contentFrag.appendChild(document.createComment(' field:tabContent '));
 
     // "Bekijk alle" link
     const viewAllLink = panel.querySelector('.tab-link a');

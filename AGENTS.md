@@ -16,7 +16,7 @@ Crosswalk project for importing selected **[koffievoordeel.nl](https://www.koffi
 
 **This repository targets AEM Edge Delivery Services with the Universal Editor (UE)** — often called **crosswalk** or **xwalk**. It is **not** a Document Authoring (Google Docs / SharePoint) project.
 
-Typical starting point: [aem-boilerplate-xwalk](https://github.com/adobe-rnd/aem-boilerplate-xwalk) and the [UE tutorial](https://www.aem.live/developer/ue-tutorial).
+Typical starting point: [ko](https://github.com/gabrielwalt/ko) and the [UE tutorial](https://www.aem.live/developer/ue-tutorial).
 
 **What crosswalk means in practice**
 

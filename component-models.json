@@ -406,14 +406,14 @@
     "fields": [
       {
         "component": "text",
-        "name": "label",
+        "name": "tabLabel",
         "value": "",
         "label": "Tab Label",
         "valueType": "string"
       },
       {
         "component": "richtext",
-        "name": "content",
+        "name": "tabContent",
         "value": "",
         "label": "Content",
         "valueType": "string"
