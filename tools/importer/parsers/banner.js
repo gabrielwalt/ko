@@ -86,9 +86,6 @@ export default function parse(element, { document }) {
 
   const block = createBlockHelper(document, { name: 'banner', cells });
 
-  // Replace the figure (or its wrapper div) with the block
-  const replaceTarget = figure.parentElement && figure.parentElement.children.length === 1
-    ? figure.parentElement
-    : figure;
-  replaceTarget.replaceWith(block);
+  // Replace the figure containing both images with the block
+  figure.replaceWith(block);
 }

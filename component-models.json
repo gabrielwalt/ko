@@ -407,12 +407,14 @@
       {
         "component": "text",
         "name": "label",
+        "value": "",
         "label": "Tab Label",
         "valueType": "string"
       },
       {
         "component": "richtext",
         "name": "content",
+        "value": "",
         "label": "Content",
         "valueType": "string"
       }

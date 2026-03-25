@@ -80,9 +80,5 @@ export default function parse(element, { document }) {
   if (cells.length === 0) return;
 
   const block = createBlockHelper(document, { name: 'accordion-faq', cells });
-
-  // Remove sibling FAQ items (they're now captured in the block)
-  allItems.forEach((item) => { if (item !== element) item.remove(); });
-  // Replace the matched element with the block
-  element.replaceWith(block);
+  faqContainer.replaceWith(block);
 }
