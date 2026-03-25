@@ -3,10 +3,11 @@
 
 /**
  * Transformer: koffievoordeel cleanup.
- * Removes non-authorable content from koffievoordeel.nl pages.
- * Selectors from captured DOM (migration-work/cleaned.html).
+ * Removes non-authorable content, converts unsupported elements,
+ * eliminates hidden/duplicate content from koffievoordeel.nl pages.
  */
 const TransformHook = { beforeTransform: 'beforeTransform', afterTransform: 'afterTransform' };
+
 
 function removeSelectors(el, selectors) {
   if (typeof WebImporter !== 'undefined' && WebImporter.DOMUtils) {
@@ -20,32 +21,129 @@ function removeSelectors(el, selectors) {
 
 export default function transform(hookName, element, payload) {
   if (hookName === TransformHook.beforeTransform) {
-    // Cookie consent dialog - found: <div id="cookie_consent_dialog" class="cookie-consent-dialog">
-    // Cookie status message - found: <div class="cookie-status-message" id="cookie-status">
+    // Cookie consent
     removeSelectors(element, [
       '#cookie_consent_dialog',
       '#cookie-status',
       '.cookie-consent-dialog',
     ]);
+
+    // Breadcrumbs (hidden by CSS on source page but still in DOM)
+    removeSelectors(element, ['.breadcrumbs']);
+
+    // Convert blockquote to div (blockquote not supported in EDS)
+    element.querySelectorAll('blockquote').forEach((bq) => {
+      const doc = element.ownerDocument || document;
+      const div = doc.createElement('div');
+      while (bq.firstChild) div.appendChild(bq.firstChild);
+      bq.replaceWith(div);
+    });
+
+    // Remove hidden desktop containers (duplicate of visible mobile versions)
+    // These are .column.main > div wrappers whose first child has class "desktop"
+    const mainColBefore = element.querySelector('.column.main');
+    if (mainColBefore) {
+      [...mainColBefore.children].forEach((child) => {
+        const fc = child.firstElementChild;
+        if (fc && fc.classList.contains('desktop')) {
+          child.remove();
+        }
+      });
+    }
+
+    // Remove hidden desktop step duplicates (column-groups near .kv-steps-slider)
+    element.querySelectorAll('.kv-steps-slider').forEach((slider) => {
+      let rowInner = slider.parentElement;
+      while (rowInner && !rowInner.classList.contains('row-full-width-inner')) {
+        rowInner = rowInner.parentElement;
+      }
+      if (!rowInner) return;
+      [...rowInner.querySelectorAll('.pagebuilder-column-group')].forEach((group) => {
+        if (group.querySelector('.kv-steps-slider')) return;
+        if (group.querySelector('h1, h2, h3')) return;
+        group.remove();
+      });
+    });
+
+    // Remove hidden form after FAQ section
+    removeSelectors(element, ['#amhideprice-form', 'form.amhideprice-form']);
   }
 
   if (hookName === TransformHook.afterTransform) {
-    // Header - found: <header class="page-header">
-    // Footer - found: <footer class="page-footer">
-    // Search forms - found: <form class="form minisearch" id="search_mini_form">
-    // Coupon message block - found: <div id="coupon-message-block">
     removeSelectors(element, [
+      // Header/footer
       'header.page-header',
       'footer.page-footer',
+      // Search
       'form.minisearch',
       '#search_autocomplete',
       '#search_autocomplete_mobile',
       '#search_autocomplete_sticky',
+      // Non-content elements
       '#coupon-message-block',
       'noscript',
       'iframe',
       'link',
+      // Hidden empty anchor (hero-quote source)
+      '#favoriete-koffie',
+      // Coffee Finder floating button
+      '.ribbon-button',
+      // Tracking pixels
+      'img[src*="bat.bing.com"]',
     ]);
+
+    // Clean up .column.main direct children: remove hidden/empty/style-only elements
+    const mainCol = element.querySelector('.column.main');
+    if (mainCol) {
+      [...mainCol.children].forEach((child) => {
+        const tag = child.tagName;
+        // Remove standalone <style> and hidden <input> elements
+        if (tag === 'STYLE' || tag === 'INPUT') {
+          child.remove();
+          return;
+        }
+        // Remove divs/forms with only <style> children or completely empty
+        if (tag === 'DIV' || tag === 'FORM') {
+          const kids = [...child.children];
+          const onlyStyles = kids.length > 0 && kids.every((c) => c.tagName === 'STYLE');
+          const isEmpty = kids.length === 0 && child.textContent.trim() === '';
+          if (onlyStyles || isEmpty) {
+            child.remove();
+          }
+        }
+      });
+
+      // Remove all content after the accordion-faq block table
+      let faqTable = null;
+      mainCol.querySelectorAll('table').forEach((t) => {
+        const header = t.querySelector('tr:first-child th') || t.querySelector('tr:first-child td');
+        if (header && header.textContent.trim() === 'accordion-faq') {
+          faqTable = t;
+        }
+      });
+      if (faqTable) {
+        // Remove siblings after the FAQ table within its parent
+        let next = faqTable.nextElementSibling;
+        while (next) {
+          const toRemove = next;
+          next = next.nextElementSibling;
+          toRemove.remove();
+        }
+        // Remove .column.main children after the FAQ table's container div
+        let containerDiv = faqTable.parentElement;
+        while (containerDiv && containerDiv.parentElement !== mainCol) {
+          containerDiv = containerDiv.parentElement;
+        }
+        if (containerDiv) {
+          let parentNext = containerDiv.nextElementSibling;
+          while (parentNext) {
+            const toRemove = parentNext;
+            parentNext = parentNext.nextElementSibling;
+            toRemove.remove();
+          }
+        }
+      }
+    }
 
     // Remove data-* attributes and event handlers
     element.querySelectorAll('*').forEach((el) => {

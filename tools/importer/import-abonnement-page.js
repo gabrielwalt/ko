@@ -5,8 +5,6 @@
 import heroSubscriptionParser from './parsers/hero-subscription.js';
 import cardsStepsParser from './parsers/cards-steps.js';
 import cardsCategoryParser from './parsers/cards-category.js';
-import cardsLogosParser from './parsers/cards-logos.js';
-import heroQuoteParser from './parsers/hero-quote.js';
 import cardsProductParser from './parsers/cards-product.js';
 import accordionFaqParser from './parsers/accordion-faq.js';
 
@@ -19,8 +17,6 @@ const parsers = {
   'hero-subscription': heroSubscriptionParser,
   'cards-steps': cardsStepsParser,
   'cards-category': cardsCategoryParser,
-  'cards-logos': cardsLogosParser,
-  'hero-quote': heroQuoteParser,
   'cards-product': cardsProductParser,
   'accordion-faq': accordionFaqParser,
 };
@@ -53,15 +49,7 @@ const PAGE_TEMPLATE = {
     },
     {
       name: 'cards-category',
-      instances: ['.column.main .coffee-beans-button', '.column.main .coffeType-mobile-icon'],
-    },
-    {
-      name: 'cards-logos',
-      instances: ['.column.main .brand-abo-gmi', '.column.main .brand-abo-illy', '.column.main .brand-abo-lavazza', '.column.main .brand-abo-cdo'],
-    },
-    {
-      name: 'hero-quote',
-      instances: ['#favoriete-koffie'],
+      instances: ['.column.main .coffeType-mobile-icon'],
     },
     {
       name: 'cards-product',
@@ -99,22 +87,6 @@ const PAGE_TEMPLATE = {
     },
     {
       id: 'section-4',
-      name: 'Brand Logos',
-      selector: ['.brand-abo-gmi', '.brand-abo-illy'],
-      style: null,
-      blocks: ['cards-logos'],
-      defaultContent: [],
-    },
-    {
-      id: 'section-5',
-      name: 'Quote Banner',
-      selector: '#favoriete-koffie',
-      style: null,
-      blocks: ['hero-quote'],
-      defaultContent: [],
-    },
-    {
-      id: 'section-6',
       name: 'Popular Products',
       selector: '.tab-align-left',
       style: null,
@@ -122,7 +94,7 @@ const PAGE_TEMPLATE = {
       defaultContent: ['.tabs-title'],
     },
     {
-      id: 'section-7',
+      id: 'section-5',
       name: 'Subscription Explanation',
       selector: '#uitleg',
       style: null,
@@ -130,7 +102,7 @@ const PAGE_TEMPLATE = {
       defaultContent: ['#uitleg ~ div h2', '#uitleg ~ div p'],
     },
     {
-      id: 'section-8',
+      id: 'section-6',
       name: 'FAQ',
       selector: '#YDF0B3T',
       style: null,

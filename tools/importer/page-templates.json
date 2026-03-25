@@ -9,31 +9,33 @@
       "blocks": [
         {
           "name": "hero-subscription",
-          "instances": [".column.main .pagebuilder-column.shadow-cards"]
+          "instances": [
+            ".column.main .pagebuilder-column.shadow-cards"
+          ]
         },
         {
           "name": "cards-steps",
-          "instances": [".kv-steps-slider"]
+          "instances": [
+            ".kv-steps-slider"
+          ]
         },
         {
           "name": "cards-category",
-          "instances": [".column.main .coffee-beans-button", ".column.main .coffeType-mobile-icon"]
-        },
-        {
-          "name": "cards-logos",
-          "instances": [".column.main .brand-abo-gmi", ".column.main .brand-abo-illy", ".column.main .brand-abo-lavazza", ".column.main .brand-abo-cdo"]
-        },
-        {
-          "name": "hero-quote",
-          "instances": ["#favoriete-koffie"]
+          "instances": [
+            ".column.main .coffeType-mobile-icon"
+          ]
         },
         {
           "name": "cards-product",
-          "instances": [".tabs-style-theme-related .product-items"]
+          "instances": [
+            ".tabs-style-theme-related .product-items"
+          ]
         },
         {
           "name": "accordion-faq",
-          "instances": [".column.main [data-collapsible=\"true\"]"]
+          "instances": [
+            ".column.main [data-collapsible=\"true\"]"
+          ]
         }
       ],
       "sections": [
@@ -42,7 +44,9 @@
           "name": "Hero",
           "selector": ".column.main > div:first-of-type",
           "style": null,
-          "blocks": ["hero-subscription"],
+          "blocks": [
+            "hero-subscription"
+          ],
           "defaultContent": []
         },
         {
@@ -50,56 +54,59 @@
           "name": "How It Works",
           "selector": ".column.main > div:nth-of-type(2)",
           "style": null,
-          "blocks": ["cards-steps"],
-          "defaultContent": ["#DYDDJVR"]
+          "blocks": [
+            "cards-steps"
+          ],
+          "defaultContent": [
+            "#DYDDJVR"
+          ]
         },
         {
           "id": "section-3",
           "name": "Choose Your Coffee",
           "selector": ".column.main > div:nth-of-type(3)",
           "style": null,
-          "blocks": ["cards-category"],
-          "defaultContent": ["#PWJHN6R"]
+          "blocks": [
+            "cards-category"
+          ],
+          "defaultContent": [
+            "#PWJHN6R"
+          ]
         },
         {
           "id": "section-4",
-          "name": "Brand Logos",
-          "selector": [".brand-abo-gmi", ".brand-abo-illy"],
-          "style": null,
-          "blocks": ["cards-logos"],
-          "defaultContent": []
-        },
-        {
-          "id": "section-5",
-          "name": "Quote Banner",
-          "selector": "#favoriete-koffie",
-          "style": null,
-          "blocks": ["hero-quote"],
-          "defaultContent": []
-        },
-        {
-          "id": "section-6",
           "name": "Popular Products",
           "selector": ".tab-align-left",
           "style": null,
-          "blocks": ["cards-product"],
-          "defaultContent": [".tabs-title"]
+          "blocks": [
+            "cards-product"
+          ],
+          "defaultContent": [
+            ".tabs-title"
+          ]
         },
         {
-          "id": "section-7",
+          "id": "section-5",
           "name": "Subscription Explanation",
           "selector": "#uitleg",
           "style": null,
           "blocks": [],
-          "defaultContent": ["#uitleg ~ div h2", "#uitleg ~ div p"]
+          "defaultContent": [
+            "#uitleg ~ div h2",
+            "#uitleg ~ div p"
+          ]
         },
         {
-          "id": "section-8",
+          "id": "section-6",
           "name": "FAQ",
           "selector": "#YDF0B3T",
           "style": null,
-          "blocks": ["accordion-faq"],
-          "defaultContent": ["#YDF0B3T"]
+          "blocks": [
+            "accordion-faq"
+          ],
+          "defaultContent": [
+            "#YDF0B3T"
+          ]
         }
       ]
     }

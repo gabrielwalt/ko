@@ -6,9 +6,8 @@
  * Base: cards. Source: https://www.koffievoordeel.nl/abonnement
  * Model fields (per card): image (reference), text (richtext)
  * Container block: Each category = 1 row with [image | text]
- * Source selector: .coffee-beans-button, .coffeType-mobile-icon
- * Generated: 2026-03-25
- * Updated: 2026-03-25v4
+ * Source selector: .coffeType-mobile-icon
+ * Also collects brand logos (.brand-abo-*, .brand-starbucks) into same block.
  */
 
 function createBlockHelper(doc, { name, cells }) {
@@ -40,27 +39,46 @@ function createBlockHelper(doc, { name, cells }) {
 }
 
 export default function parse(element, { document }) {
-  // Skip if already processed (parent removed by earlier call)
   if (!element.parentElement) return;
 
-  // element = .coffee-beans-button or .coffeType-mobile-icon
+  // element = .coffeType-mobile-icon column
   // Navigate to the column-line that holds all category columns
   const columnLine = element.closest('.pagebuilder-column-line') || element.parentElement;
   if (!columnLine) return;
 
-  // Find all category columns with icons
   const columns = [...columnLine.querySelectorAll('.pagebuilder-column')];
-
   const cells = [];
+
+  // Collect category items (image + link text)
   columns.forEach((col) => {
     const figure = col.querySelector('figure');
+    if (!figure) return;
+    const img = figure.querySelector('img');
+
+    // Find text link: .icon-button-text and <a> are siblings inside a wrapper div
     const iconText = col.querySelector('.icon-button-text');
-    if (!figure && !iconText) return;
+    let linkEl = null;
+    let linkText = '';
+    if (iconText) {
+      // The <a> is a sibling of .icon-button-text within the same parent div
+      const wrapper = iconText.parentElement;
+      linkEl = wrapper ? wrapper.querySelector('a[href]') : null;
+      if (!linkEl) {
+        // Fallback: find any link in the column that isn't inside the figure
+        const allLinks = [...col.querySelectorAll('a[href]')];
+        linkEl = allLinks.find((l) => !figure.contains(l)) || allLinks[0];
+      }
+      linkText = iconText.textContent.trim();
+    } else {
+      // Fallback: find link not inside figure
+      const allLinks = [...col.querySelectorAll('a[href]')];
+      linkEl = allLinks.find((l) => !figure.contains(l)) || allLinks[0];
+      if (linkEl) linkText = linkEl.textContent.trim();
+    }
 
     // Image cell with field hint
     const imageFrag = document.createDocumentFragment();
     imageFrag.appendChild(document.createComment(' field:image '));
-    const img = figure ? figure.querySelector('img') : null;
     if (img) {
       const newImg = document.createElement('img');
       newImg.src = img.src;
@@ -71,12 +89,11 @@ export default function parse(element, { document }) {
     // Text cell with field hint
     const textFrag = document.createDocumentFragment();
     textFrag.appendChild(document.createComment(' field:text '));
-    const link = iconText ? iconText.querySelector('a') : null;
-    if (link) {
+    if (linkEl && linkText) {
       const p = document.createElement('p');
       const a = document.createElement('a');
-      a.href = link.href;
-      a.textContent = link.textContent.trim();
+      a.href = linkEl.href;
+      a.textContent = linkText;
       p.appendChild(a);
       textFrag.appendChild(p);
     }
@@ -93,6 +110,5 @@ export default function parse(element, { document }) {
     if (col !== element && col.parentElement) col.remove();
   });
 
-  // Replace the matched element itself with the block
   element.replaceWith(block);
 }
