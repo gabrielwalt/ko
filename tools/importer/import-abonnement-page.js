@@ -102,14 +102,6 @@ const PAGE_TEMPLATE = {
       defaultContent: ['#PWJHN6R'],
     },
     {
-      id: 'section-4',
-      name: 'Popular Products',
-      selector: '.tab-align-left',
-      style: null,
-      blocks: ['tabs'],
-      defaultContent: ['.tabs-title'],
-    },
-    {
       id: 'section-5',
       name: 'Subscription Explanation',
       selector: '#uitleg',

@@ -2,12 +2,16 @@
 /* global WebImporter */
 
 /**
- * Parser for tabs.
+ * Parser for tabs (section-based auto-blocking).
  * Source: https://www.koffievoordeel.nl/abonnement
- * Model fields (per panel): label (text), content (richtext)
- * Container block: Each tab = 1 row with [label | content]
+ * Instead of creating a single block table, outputs each tab panel as
+ * its own section with Section Metadata containing tabTitle.
+ * Each tab section contains a "Bekijk alle" link (default content)
+ * followed by a cards-product block with [image | text] rows.
+ * The frontend auto-blocking code detects consecutive tab-title sections
+ * and combines them into a synthetic tabs block at render time.
+ *
  * Source selector: .tab-align-left
- * Tab content includes "Bekijk alle" link + product cards as richtext.
  */
 
 function createBlockHelper(doc, { name, cells }) {
@@ -38,9 +42,32 @@ function createBlockHelper(doc, { name, cells }) {
   return table;
 }
 
-function extractProductContent(product, document) {
-  const frag = document.createDocumentFragment();
+function createSectionMetadata(doc, props) {
+  if (typeof WebImporter !== 'undefined' && WebImporter.Blocks) {
+    const cells = Object.entries(props).map(([key, value]) => [key, value]);
+    return WebImporter.Blocks.createBlock(doc, { name: 'Section Metadata', cells });
+  }
+  const table = doc.createElement('table');
+  const headerRow = doc.createElement('tr');
+  const th = doc.createElement('th');
+  th.colSpan = 100;
+  th.textContent = 'Section Metadata';
+  headerRow.appendChild(th);
+  table.appendChild(headerRow);
+  Object.entries(props).forEach(([key, value]) => {
+    const tr = doc.createElement('tr');
+    const tdKey = doc.createElement('td');
+    tdKey.textContent = key;
+    tr.appendChild(tdKey);
+    const tdVal = doc.createElement('td');
+    tdVal.textContent = value;
+    tr.appendChild(tdVal);
+    table.appendChild(tr);
+  });
+  return table;
+}
 
+function buildProductCard(product, document) {
   const productImg = product.querySelector('.product-image-photo.photo');
   const nameLink = product.querySelector('.product-item-link');
   const strengthLabel = product.querySelector('.strength-label');
@@ -49,14 +76,19 @@ function extractProductContent(product, document) {
   const oldPrice = product.querySelector('.old-price .price');
   const ctaLink = product.querySelector('.actions-primary a');
 
+  // Image cell
+  const imageFrag = document.createDocumentFragment();
+  imageFrag.appendChild(document.createComment(' field:image '));
   if (productImg && !/placeholder/i.test(productImg.src)) {
-    const p = document.createElement('p');
     const img = document.createElement('img');
     img.src = productImg.src;
     img.alt = productImg.alt || '';
-    p.appendChild(img);
-    frag.appendChild(p);
+    imageFrag.appendChild(img);
   }
+
+  // Text cell (richtext)
+  const textFrag = document.createDocumentFragment();
+  textFrag.appendChild(document.createComment(' field:text '));
 
   if (nameLink) {
     const h3 = document.createElement('h3');
@@ -64,7 +96,7 @@ function extractProductContent(product, document) {
     a.href = nameLink.href;
     a.textContent = nameLink.textContent.trim();
     h3.appendChild(a);
-    frag.appendChild(h3);
+    textFrag.appendChild(h3);
   }
 
   if (strengthLabel) {
@@ -72,13 +104,13 @@ function extractProductContent(product, document) {
     const strong = document.createElement('strong');
     strong.textContent = 'Intensiteit ' + strengthLabel.textContent.trim() + '/12';
     p.appendChild(strong);
-    frag.appendChild(p);
+    textFrag.appendChild(p);
   }
 
   if (description) {
     const p = document.createElement('p');
     p.textContent = description.textContent.trim().replace(/\s+/g, ' ');
-    frag.appendChild(p);
+    textFrag.appendChild(p);
   }
 
   if (specialPrice) {
@@ -92,7 +124,7 @@ function extractProductContent(product, document) {
     const strong = document.createElement('strong');
     strong.textContent = specialPrice.textContent.trim().replace(/\s+/g, '');
     p.appendChild(strong);
-    frag.appendChild(p);
+    textFrag.appendChild(p);
   }
 
   if (ctaLink) {
@@ -101,10 +133,10 @@ function extractProductContent(product, document) {
     a.href = ctaLink.href;
     a.textContent = ctaLink.textContent.trim();
     p.appendChild(a);
-    frag.appendChild(p);
+    textFrag.appendChild(p);
   }
 
-  return frag;
+  return [imageFrag, textFrag];
 }
 
 export default function parse(element, { document }) {
@@ -114,24 +146,20 @@ export default function parse(element, { document }) {
   const tabPanels = element.querySelectorAll('[role="tabpanel"]');
   const tabHeaders = element.querySelectorAll('[role="tab"]');
 
-  const cells = [];
+  if (tabPanels.length === 0) return;
 
+  const frag = document.createDocumentFragment();
+
+  // Output each tab panel as its own section
   tabPanels.forEach((panel, i) => {
-    // Tab label
     const tabHeader = tabHeaders[i];
     const label = panel.getAttribute('data-tab-name')
       || (tabHeader ? tabHeader.textContent.trim() : `Tab ${i + 1}`);
 
-    // Label cell (plain text for "text" component)
-    const labelFrag = document.createDocumentFragment();
-    labelFrag.appendChild(document.createComment(' field:tabLabel '));
-    labelFrag.appendChild(document.createTextNode(label));
+    // Section break before each tab section
+    frag.appendChild(document.createElement('hr'));
 
-    // Content cell — richtext with "Bekijk alle" link + product cards
-    const contentFrag = document.createDocumentFragment();
-    contentFrag.appendChild(document.createComment(' field:tabContent '));
-
-    // "Bekijk alle" link
+    // "Bekijk alle" link as default content
     const viewAllLink = panel.querySelector('.tab-link a');
     if (viewAllLink) {
       const p = document.createElement('p');
@@ -139,20 +167,19 @@ export default function parse(element, { document }) {
       a.href = viewAllLink.href;
       a.textContent = viewAllLink.textContent.trim();
       p.appendChild(a);
-      contentFrag.appendChild(p);
+      frag.appendChild(p);
     }
 
-    // Product cards as richtext (limit to 3 per tab)
+    // Products as a cards-product block (limit to 3 per tab)
     const products = [...panel.querySelectorAll('.product-item')].slice(0, 3);
-    products.forEach((product) => {
-      contentFrag.appendChild(extractProductContent(product, document));
-    });
+    if (products.length > 0) {
+      const cells = products.map((product) => buildProductCard(product, document));
+      frag.appendChild(createBlockHelper(document, { name: 'cards-product', cells }));
+    }
 
-    cells.push([labelFrag, contentFrag]);
+    // Section Metadata with tabTitle for auto-blocking
+    frag.appendChild(createSectionMetadata(document, { tabTitle: label }));
   });
 
-  if (cells.length === 0) return;
-
-  const block = createBlockHelper(document, { name: 'tabs', cells });
-  element.replaceWith(block);
+  element.replaceWith(frag);
 }

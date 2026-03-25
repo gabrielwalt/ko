@@ -146,10 +146,43 @@
     ]
   },
   {
-    "id": "accordion-faq-item",
+    "id": "tab",
     "fields": [
       {
         "component": "text",
+        "name": "tabTitle",
+        "value": "",
+        "label": "Tab Title",
+        "valueType": "string"
+      },
+      {
+        "component": "text",
+        "name": "name",
+        "label": "Section Name",
+        "description": "The label shown for this section in the Content Tree"
+      },
+      {
+        "component": "multiselect",
+        "name": "style",
+        "label": "Style",
+        "options": [
+          {
+            "name": "Highlight",
+            "value": "highlight"
+          },
+          {
+            "name": "Beige",
+            "value": "beige"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "accordion-faq-item",
+    "fields": [
+      {
+        "component": "richtext",
         "valueType": "string",
         "name": "summary",
         "value": "",
@@ -219,7 +252,7 @@
     ]
   },
   {
-    "id": "card",
+    "id": "cards-category-card",
     "fields": [
       {
         "component": "reference",
@@ -238,7 +271,7 @@
     ]
   },
   {
-    "id": "card",
+    "id": "cards-product-card",
     "fields": [
       {
         "component": "reference",
@@ -257,7 +290,7 @@
     ]
   },
   {
-    "id": "card",
+    "id": "cards-steps-card",
     "fields": [
       {
         "component": "reference",
@@ -276,7 +309,7 @@
     ]
   },
   {
-    "id": "card",
+    "id": "cards-card",
     "fields": [
       {
         "component": "reference",
@@ -397,25 +430,6 @@
         "name": "text",
         "value": "",
         "label": "Text",
-        "valueType": "string"
-      }
-    ]
-  },
-  {
-    "id": "tabs-panel",
-    "fields": [
-      {
-        "component": "text",
-        "name": "tabLabel",
-        "value": "",
-        "label": "Tab Label",
-        "valueType": "string"
-      },
-      {
-        "component": "richtext",
-        "name": "tabContent",
-        "value": "",
-        "label": "Content",
         "valueType": "string"
       }
     ]

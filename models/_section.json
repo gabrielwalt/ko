@@ -13,12 +13,62 @@
           }
         }
       }
+    },
+    {
+      "title": "Tab",
+      "id": "tab",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/section/v1/section",
+            "template": {
+              "name": "Tab",
+              "model": "tab",
+              "filter": "section",
+              "tabTitle": "Tab"
+            }
+          }
+        }
+      }
     }
   ],
   "models": [
     {
       "id": "section",
       "fields": [
+        {
+          "component": "text",
+          "name": "name",
+          "label": "Section Name",
+          "description": "The label shown for this section in the Content Tree"
+        },
+        {
+          "component": "multiselect",
+          "name": "style",
+          "label": "Style",
+          "options": [
+            {
+              "name": "Highlight",
+              "value": "highlight"
+            },
+            {
+              "name": "Beige",
+              "value": "beige"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tab",
+      "fields": [
+        {
+          "component": "text",
+          "name": "tabTitle",
+          "value": "",
+          "label": "Tab Title",
+          "valueType": "string"
+        },
         {
           "component": "text",
           "name": "name",
@@ -60,8 +110,7 @@
         "fragment",
         "hero-subscription",
         "accordion-faq",
-        "banner",
-        "tabs"
+        "banner"
       ]
     }
   ]

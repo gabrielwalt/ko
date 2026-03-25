@@ -59,12 +59,81 @@ async function loadFonts() {
 }
 
 /**
+ * Read a tabTitle value from a section-metadata block inside a section div.
+ * Returns the title string or null if none found.
+ */
+function getTabTitle(section) {
+  const meta = section.querySelector('.section-metadata');
+  if (!meta) return null;
+  const rows = [...meta.children];
+  for (let r = 0; r < rows.length; r += 1) {
+    const cells = [...rows[r].children];
+    if (cells.length >= 2
+      && cells[0].textContent.trim().toLowerCase() === 'tabtitle') {
+      return cells[1].textContent.trim();
+    }
+  }
+  return null;
+}
+
+/**
+ * Detect consecutive sections with tabTitle metadata and combine them
+ * into a single tabs block inside the preceding section.
+ * @param {Element} main The container element
+ */
+function buildTabsAutoBlock(main) {
+  const sections = [...main.children];
+  let i = 0;
+  while (i < sections.length) {
+    if (!getTabTitle(sections[i])) {
+      i += 1;
+    } else {
+      // Collect consecutive tab sections
+      const group = [];
+      while (i < sections.length && getTabTitle(sections[i])) {
+        group.push({ title: getTabTitle(sections[i]), el: sections[i] });
+        i += 1;
+      }
+
+      if (group.length >= 2) {
+        // Build tabs block: each child row = [label | content]
+        const block = document.createElement('div');
+        group.forEach(({ title, el }) => {
+          const row = document.createElement('div');
+          const labelDiv = document.createElement('div');
+          labelDiv.textContent = title;
+          row.append(labelDiv);
+          const contentDiv = document.createElement('div');
+          [...el.children].forEach((child) => {
+            if (!child.classList.contains('section-metadata')) {
+              contentDiv.append(child);
+            }
+          });
+          row.append(contentDiv);
+          block.append(row);
+        });
+        block.classList.add('tabs');
+
+        // Merge tabs block into the preceding section
+        const prev = group[0].el.previousElementSibling;
+        if (prev) {
+          prev.append(block);
+        }
+
+        // Remove the consumed tab-section divs
+        group.forEach(({ el }) => el.remove());
+      }
+    }
+  }
+}
+
+/**
  * Builds all synthetic blocks in a container element.
  * @param {Element} main The container element
  */
-function buildAutoBlocks() {
+function buildAutoBlocks(main) {
   try {
-    // TODO: add auto block, if needed
+    buildTabsAutoBlock(main);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Auto Blocking failed', error);

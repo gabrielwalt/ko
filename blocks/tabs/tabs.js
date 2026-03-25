@@ -45,7 +45,8 @@ export default async function decorate(block) {
     });
     tablist.append(button);
     tab.remove();
-    moveInstrumentation(button.querySelector('p'), null);
+    const labelP = button.querySelector('p');
+    if (labelP) moveInstrumentation(labelP, null);
   });
 
   block.prepend(tablist);

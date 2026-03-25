@@ -2,7 +2,8 @@
   {
     "id": "main",
     "components": [
-      "section"
+      "section",
+      "tab"
     ]
   },
   {
@@ -21,8 +22,7 @@
       "fragment",
       "hero-subscription",
       "accordion-faq",
-      "banner",
-      "tabs"
+      "banner"
     ]
   },
   {
@@ -34,25 +34,25 @@
   {
     "id": "cards-category",
     "components": [
-      "card"
+      "cards-category-card"
     ]
   },
   {
     "id": "cards-product",
     "components": [
-      "card"
+      "cards-product-card"
     ]
   },
   {
     "id": "cards-steps",
     "components": [
-      "card"
+      "cards-steps-card"
     ]
   },
   {
     "id": "cards",
     "components": [
-      "card"
+      "cards-card"
     ]
   },
   {
@@ -68,12 +68,6 @@
       "image",
       "button",
       "title"
-    ]
-  },
-  {
-    "id": "tabs",
-    "components": [
-      "tabs-panel"
     ]
   }
 ]
